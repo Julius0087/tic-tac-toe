@@ -16,10 +16,19 @@ class Board
     ]
   end
 
-  attr_reader :grid, :coordinates_grid
+  attr_accessor :grid, :coordinates_grid
 
   def update_grid(symbol, coordinates)
-    
+    @coordinates_grid.each_with_index do |line, index|
+      row = line.index(coordinates)
+      unless row.nil?
+        @grid[index][row] = symbol
+      end
+    end
+  end
+
+  def print_grid
+    puts(self.grid.map { |x| x.join })
   end
 end
 
@@ -29,8 +38,7 @@ class Player
   end
 
   def play_turn(coordinates, board)
-    board.update_grid(self.symbol, coordinates)
-
+    board.update_grid(@symbol, coordinates)
   end
 end
 
@@ -39,8 +47,10 @@ board = Board.new()
 player1 = Player.new("X")
 player2 = Player.new("O")
 
-puts board.coordinates_grid.map { |line| line.join }
-puts board.grid.map { |x| x.join }
+already_placed = []
+
+puts(board.coordinates_grid.map { |line| line.join })
+puts(board.grid.map { |x| x.join })
 
 9.times do
   current_player = player1
@@ -50,11 +60,15 @@ puts board.grid.map { |x| x.join }
     input = gets.chomp.to_i
     if input > 9 || input < 1
       puts "Invalid coordinates"
-      # add already placed handling
+    elsif already_placed.include?(input)
+      puts 'Already placed'
     else
-      coordinates = input 
+      coordinates = input
       break
     end
   end
-  current_player.play_turn(coordinates, board)
+  current_player.play_turn(coordinates.to_s, board)
+  already_placed.push(coordinates)
+
+  board.print_grid
 end
