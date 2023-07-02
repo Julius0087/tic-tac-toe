@@ -37,8 +37,17 @@ class Player
     @symbol = symbol
   end
 
-  def play_turn(coordinates, board)
+  attr_reader :symbol
+
+  def play_turn(coordinates, board, already_placed)
     board.update_grid(@symbol, coordinates)
+    # check for win
+    check_for_win(already_placed)
+  end
+
+  def check_for_win(already_placed)
+    # TODO: find a way to compare the already_placed array with arrays that contain winning combinations
+    (already_placed[@symbol.to_sym] & [1, 2, 3]).any?
   end
 end
 
@@ -47,13 +56,16 @@ board = Board.new()
 player1 = Player.new("X")
 player2 = Player.new("O")
 
-already_placed = []
+already_placed = {
+  X: [],
+  O: []}
 
 puts(board.coordinates_grid.map { |line| line.join })
 puts(board.grid.map { |x| x.join })
 
+switch_index = 0
 9.times do
-  current_player = player1
+  current_player = switch_index.even? ? player1 : player2
   coordinates = 0
   loop do
     puts "Enter your coordinates (1-9)"
@@ -67,8 +79,13 @@ puts(board.grid.map { |x| x.join })
       break
     end
   end
-  current_player.play_turn(coordinates.to_s, board)
-  already_placed.push(coordinates)
+  result = current_player.play_turn(coordinates.to_s, board, already_placed)
+  break if result == true
+
+  already_placed[current_player.symbol.to_sym] << coordinates
 
   board.print_grid
+  switch_index += 1
 end
+puts "It's a tie!"
+puts already_placed
