@@ -14,9 +14,19 @@ class Board
       ['-', '-', '-', '|', '-', '-', '-', '|', '-', '-', '-'],
       [' ', '7', ' ', '|', ' ', '8', ' ', '|', ' ', '9', ' ']
     ]
+    @winning_combinations = [
+      [1, 2, 3],
+      [4, 5, 6],
+      [7, 8, 9],
+      [1, 5, 9],
+      [3, 5, 7],
+      [1, 4, 7],
+      [2, 5, 8],
+      [3, 6, 9]
+    ]
   end
 
-  attr_accessor :grid, :coordinates_grid
+  attr_accessor :grid, :coordinates_grid, :winning_combinations
 
   def update_grid(symbol, coordinates)
     @coordinates_grid.each_with_index do |line, index|
@@ -41,13 +51,16 @@ class Player
 
   def play_turn(coordinates, board, already_placed)
     board.update_grid(@symbol, coordinates)
-    # check for win
-    check_for_win(already_placed)
   end
 
-  def check_for_win(already_placed)
+  def check_for_win(already_placed, board)
     # TODO: find a way to compare the already_placed array with arrays that contain winning combinations
-    (already_placed[@symbol.to_sym] & [1, 2, 3]).any?
+    board.winning_combinations.each do |combination|
+      result = already_placed[@symbol.to_sym].intersection(combination)
+      if result.sort == combination
+        return true
+      end
+    end
   end
 end
 
@@ -61,6 +74,7 @@ already_placed = {
   O: []}
 
 puts(board.coordinates_grid.map { |line| line.join })
+puts "\n\n"
 puts(board.grid.map { |x| x.join })
 
 switch_index = 0
@@ -72,7 +86,8 @@ switch_index = 0
     input = gets.chomp.to_i
     if input > 9 || input < 1
       puts "Invalid coordinates"
-    elsif already_placed.include?(input)
+    # better way to check for this? already placed as a class variable for each player?
+    elsif already_placed[:X].include?(input) || already_placed[:O].include?(input)
       puts 'Already placed'
     else
       coordinates = input
@@ -83,9 +98,13 @@ switch_index = 0
   break if result == true
 
   already_placed[current_player.symbol.to_sym] << coordinates
-
   board.print_grid
+  if current_player.check_for_win(already_placed, board) == true
+    puts "#{current_player.symbol} has won!"
+    exit
+  end
+
   switch_index += 1
 end
 puts "It's a tie!"
-puts already_placed
+
