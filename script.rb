@@ -54,7 +54,6 @@ class Player
   end
 
   def check_for_win(already_placed, board)
-    # TODO: find a way to compare the already_placed array with arrays that contain winning combinations
     board.winning_combinations.each do |combination|
       result = already_placed[@symbol.to_sym].intersection(combination)
       if result.sort == combination
@@ -75,14 +74,14 @@ already_placed = {
 
 puts(board.coordinates_grid.map { |line| line.join })
 puts "\n\n"
-puts(board.grid.map { |x| x.join })
+board.print_grid
 
 switch_index = 0
 9.times do
   current_player = switch_index.even? ? player1 : player2
   coordinates = 0
   loop do
-    puts "Enter your coordinates (1-9)"
+    puts "Player #{current_player.symbol} enter your coordinates (1-9)"
     input = gets.chomp.to_i
     if input > 9 || input < 1
       puts "Invalid coordinates"
@@ -108,3 +107,7 @@ switch_index = 0
 end
 puts "It's a tie!"
 
+# TODO:
+# refactor the board code to make it simpler
+# add a different message each turn ("Player X - choose your coordinates...")
+# private setup in classes
