@@ -68,6 +68,7 @@ class Game
     @player_one = Player.new('X')
     @player_two = Player.new('O')
     @current_player = @player_two
+    # test if player and board classes received .new (once or twice)
   end
 
   def play
@@ -87,10 +88,12 @@ class Game
       break if game_won?(currrent_symbol)
       break if tie?
     end
+    # test all methods called in this method
   end
 
   def select_player
     return @current_player == @player_one ? @player_two : @player_one
+    # test if correct player is returned
   end
 
   def get_input
